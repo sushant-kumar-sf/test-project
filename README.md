@@ -87,11 +87,37 @@ You can create import configuration records under **File Import Configs** Tab
 | Record Type | Description |
 |-------------|-------------|
 | Config Header | This record Type is used as parent record and it's **Name** field value is used as **configName** parameter. |
-| Config Field | This record type is used as child record and it stores field api name and column number mapping. |
+| Config Field | This record type is used as child record and it stores field api name and column number mapping with some additional information. |
+
+
+#### Understanding _Config Header_ Record
+
+| Field Name | Description | Required |
+|------------|-------------|----------|
+| File Import Config Name | A unique Name used as **configName** in  _openWizard()_ function | true |
+| Description | A short note about configuration | false |
 
 
 
 
+ #### Understanding _Config Field Record
 
- 
+| Field Name | Description | Required |
+|------------|-------------|----------|
+| File Import Config Name | Name of the configuration field |true |
+| File Import Config Header | A config header record for which field configuration is getting created | true |
+| Field Api Name | Api name of field in which column data is imported | true |
+| Data Type | Data type of column | true |
+| External Key Api Name | This field required only when data type is **REFERENCE**. The CSV column value is matched against this Api name in order to get the refrenced record Id.<br /> **Use case:** You are importing Contacts and Account's primary email address is available in one of the CSV file column and you have to link accounts with contacts. In this scenarion **Field Api Name** value will be **AccountId** (a field on Contact object) and **External Key Api Name** value will be **PrimaryEmail__c** (a field on Account object)| true |
+| Match Case-Sensitive | This field is available only when data type is **REFERENCE**. When checked it match **External Key Api Name** value case sensitively. | false |
+| Required | When checked, a value must be provided in CSV cell otherwise it shows an error message to user. | false |
+| Data Source | It has two values **CSV File** and **Fixed Value**. When CSV File selected **Column Sequence (Import File)** field appears on the page. When Fixed Value selected **Value** field appears on the page. | true |
+| Column Sequence (Import File) | This field is available and required when Data Source is **CSV File**. It stores **column number** of CSV File which data is imported in **Field Api Name** field. It starts from 1 | true |
+| Column Name (Import File) | This field is available and required when Data Source is **CSV File**. It stores the column name | true |
+| Value | This field is available and required when Data Source is **Fixed Value**. It is used to provide default value for some fields. | true |
+| Skip Pre Population | When checked, field config record is skiped while importing data. <br /> **Use case:** You have configured/mapped one CSV file field but you don't want to use it for specific import. | false |
+| Format | This field is available and required only when Data Type id **DATE** OR **DATETIME**. It should be the same as the Date format in the CSV file. Example: If the Date in the CSV file is 01/31/2000 then Format will be mm/dd/yyyy. Alphabets are not supported in the Date value. Example:- 01/Jan/2021 is an unacceptable date value from CSV. | true |
+
+
+
 
