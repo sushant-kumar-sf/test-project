@@ -1,122 +1,65 @@
-# File Import Wizard
-This component provides easy way to import data from **CSV** file. It is build on LWC framework, so it can be used by wraping in Aura as well as LWC components.
+# Pending Approval List
+**Pending Approval List** component provides easy access to Pending Approvals assigned to User or Queue. This components includes **Approve,** **Reject**, and **Reassign** actions.
 
-## Example
-
-#### example.cmp
-```
-<aura:component>
-    <c:fileImportWizard aura:id="file-import-wizard" 
-                            onimportsuccess="{!c.handleImportSuccess}" 
-                            onclose="{!c.handleClose}" />
-    
-    <lightning:button label="Import" 
-                        iconName="utility:upload" 
-                        onclick="{!c.openFileImportWizard}" />
-</aura:component>
-
-```
-
-#### exampleController.js
-```
-({
-    openFileImportWizard: function(component, event, helper) {
-        let configName = "ContactsImport";
-        let objectApiName = "Contact";
-        let uniqueIdentifier = "ANY_UNIQUE_VALUE"; // This will help in identifying import success when multiple import button available on the page
-        let preDefinedFields = [
-            { fieldApiName: "RecordTypeId", value: "RECORD_TYPE_ID"},
-            { fieldApiName: "AccountId", value: "ACCOUNT_ID"},
-            { fieldApiName: "ANY_AUTO_INCREMENT_FIELD", isAutoIncrement: true, startValue: 1}
-        ];
-        
-        component.find("file-import-wizard").openWizard(configName, objectApiName, preDefinedFields, uniqueIdentifier);
-    },
-    
-    
-    handleImportSuccess: function(component, event, helper) {
-        // Write logic for processing data on import success
-        let recordIds = event.getParam("recordIds");
-        let uniqueIdentifier = event.getParam("identifier");
-        let fileImportConfigs = event.getParam("configs");
-    },
-    
-    
-    handleClose: function(component, event, helper) {
-        // Logic to run on post close/cancel of file import wizard
-    }
-})
-```
-
-## Understanding Parameters passed to _openWizard()_ function
-
-#### configName
-It is a **required** parameter. <br />
-A **File Import Config** record of record type **Config Header** needs to be created. Name of this record will be used as **configName**. <br />
-Child records of record type **Config Field** needs to be created under **Config Header** record for mapping object fields with CSV columns. **Revisited this topic in the end**.
+<br />
 
 
-#### objectApiName
-It is a **required** parameter. <br />
-This is the Api Name of SObject in which records are getting imported.
+## Configurations
+There are two Custom Metadata Types to support the configuration of Pending Approval List which are **Approval List** and **Approval List Field**. 
 
-#### preDefinedFields
-It is an **optional** parameter. <br />
-Developer can decide some fields as predefined fields like parent Id, Record type, owner etc. These fields data can not be overwriten by File import config records. Developer can also make some integer fields as auto increment field by putting attribute **isAutoIncrement: true** and providing starting value in **startValue** attribute.
+<br />
 
-#### uniqueIdentifier
-It is an **optional** parameter. <br />
-This can be any unique value of developer's choice. It is received on import success. Useful when many import buttons available on the page.
+### Approval List
 
-
-## Events
-
-#### onimportsuccess
-This event is published/fired on successfull import of records. Developer will get **recordIds** of imported record, **identifier** which was passed in **openWizard()** function and **configs** (File import configs) which are used for importing files.
-
-
-#### onclose
-This event is published on cancel/close of **File import wizard**
-
-
-## File Import Configs
-You can create import configuration records under **File Import Configs** Tab
-
-#### Record Types
-
-| Record Type | Description |
-|-------------|-------------|
-| Config Header | This record Type is used as parent record and it's **Name** field value is used as **configName** parameter. |
-| Config Field | This record type is used as child record and it stores field api name and column number mapping with some additional information. |
+| Field Name | Description |
+|------------|-------------|
+| Label      | Provide the name for Approval List. This value will be required to pass while configuring/dragging the component on page. |
+|Approval List Name | Unique name for Approval List Record. |
+| Object Name | Object for which you want to show approvals. |
+| Display Text | This value will be visible as the name of the Approval List on the component|
+| Most Recent Approver Sequence | Enter the squence number for **Most Recent  Approver** column. Leave this field empty if you don't want to show this column. |
+| Date Submitted Sequence | Enter the squence number for **Date Submitted** column. Leave this field empty if you don't want to show this column. |
+| Submitted By Sequence |  Enter the squence number for **Submitted By** column. Leave this field empty if you don't want to show this column. |
+| Type Sequence | This field shows Object name with which approval request is associtaed. Enter the squence number for **Type** column. Leave this field empty if you don't want to show this column. |
+| Step Name Sequence | Enter the squence number for **Step Name** column. Leave this field empty if you don't want to show this column. |
+| Actual Approver Sequence | Enter the squence number for **Actual Approver** column. Leave this field empty if you don't want to show this column. |
+| Assigned To Sequence | Enter the squence number for **Assigned To** column. Leave this field empty if you don't want to show this column. |
 
 
-#### Understanding _Config Header_ Record
+<br />
 
-| Field Name | Description | Required |
-|------------|-------------|----------|
-| File Import Config Name | A unique Name used as **configName** in  _openWizard()_ function | true |
-| Description | A short note about configuration | false |
+### Approval List Field
+
+This configuration help in showing additional columns on **Pending Approval List** from the related record information. 
+
+Example:- There is an approval on Opportunity and you want to show Opportunity Status in the Pending Approval List then you can create one record of Approval List Field.
+
+| Field Name | Description | 
+-------------|--------------|
+| Label | Provide a label for field configuration.|
+| Approval List | Select the **Approval List** record created based on the above information. |
+| Output Type | This picklist has following values:- **Text, Date, Dattime, Checkbox,** and **Url**.  Please select output type for data formating.|
+| Column Label | Column Label on the Pending Approval List table. |
+| Field Api Name | Api name of the field of which you want to show data. Relationship fields are also supported. Field api names must be mentioned relative of the Target object. Example (1):- There is an Approval on Opportunity and you want to show the Opportunity Status field value on the Pending Approval List then you have to mention the field api name as **Status**. Example(2):- There is an Approval on Opportunity and you want to show the Account name field value on the Pending Approval List then you have to mention the field api name as **Account.Name**. |
+| Field Api Name (Link Id) | This field is required only when you select the Output type as **Url**. Relationship fields are also supported. Consider the example mentioned for Field Api Name.  |
+| Sequence | Sequence of the column. Please note that sequence values mentioned on the Approval List are considered togther with Approval List Field record sequence.|
 
 
+<br />
+
+### Design Attributes / Page level configurations
+
+`Configuration Name`: This value is same as Approval List's record Label
+
+`Page Size`: Default page size on the Approval List.
+
+`Approve Action` : Check this to make **Approve** action available on column level as well as for bulk action.
 
 
- #### Understanding _Config Field Record
+`Reject Action` : Check this to make **Reject** action available on column level as well as for bulk action.
 
-| Field Name | Description | Required |
-|------------|-------------|----------|
-| File Import Config Name | Name of the configuration field |true |
-| File Import Config Header | A config header record for which field configuration is getting created | true |
-| Field Api Name | Api name of field in which column data is imported | true |
-| Data Type | Data type of column | true |
-| External Key Api Name | This field required only when data type is **REFERENCE**. The CSV column value is matched against this Api name in order to get the refrenced record Id.<br /> **Use case:** You are importing Contacts and Account's primary email address is available in one of the CSV file column and you have to link accounts with contacts. In this scenarion **Field Api Name** value will be **AccountId** (a field on Contact object) and **External Key Api Name** value will be **PrimaryEmail__c** (a field on Account object)| true |
-| Match Case-Sensitive | This field is available only when data type is **REFERENCE**. When checked it match **External Key Api Name** value case sensitively. | false |
-| Required | When checked, a value must be provided in CSV cell otherwise it shows an error message to user. | false |
-| Data Source | It has two values **CSV File** and **Fixed Value**. When CSV File selected **Column Sequence (Import File)** field appears on the page. When Fixed Value selected **Value** field appears on the page. | true |
-| Column Sequence (Import File) | This field is available and required when Data Source is **CSV File**. It stores **column number** of CSV File which data is imported in **Field Api Name** field. It starts from 1 | true |
-| Column Name (Import File) | This field is available and required when Data Source is **CSV File**. It stores the column name | true |
-| Value | This field is available and required when Data Source is **Fixed Value**. It is used to provide default value for some fields. | true |
-| Skip Pre Population | When checked, field config record is skiped while importing data. <br /> **Use case:** You have configured/mapped one CSV file field but you don't want to use it for specific import. | false |
-| Format | This field is available and required only when Data Type id **DATE** OR **DATETIME**. It should be the same as the Date format in the CSV file. Example: If the Date in the CSV file is 01/31/2000 then Format will be mm/dd/yyyy. Alphabets are not supported in the Date value. Example:- 01/Jan/2021 is an unacceptable date value from CSV. | true |
+
+`Reassign Action` : Check this to make **Reassign** action available on column level as well as for bulk action. Reassignment of approval list can be done to **User** as well as **Queue**.
 
 
 
